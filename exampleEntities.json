@@ -1,0 +1,58 @@
+{
+  "healthPotion": [
+    {
+      "$type": "TheAlchemist.Components.ItemComponent, TheAlchemist",
+      "Count": 1,
+      "MaxCount": 5,
+      "Value": 0,
+      "Weight": 0.0,
+      "OnGround": true
+    },
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Health Potion",
+      "Description": "Quaff it to regain some health!"
+    },
+    {
+      "$type": "TheAlchemist.Components.SubstanceComponent, TheAlchemist",
+      "Properties": {
+        "Health": 25
+      },
+      "PropertiesKnown": true,
+      "MaterialType": "Potion"
+    }
+  ],
+  "wall": [
+    {
+      "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+      "Solid": true,
+      "EntityID": 7039
+    },
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Wall",
+      "Description": "A solid wall"
+    }
+  ],
+  "rat": [
+    {
+      "$type": "TheAlchemist.Components.NPCComponent, TheAlchemist"
+    },
+    {
+      "$type": "TheAlchemist.Components.DescriptionComponent, TheAlchemist",
+      "Name": "Rat",
+      "Description": "A small dirty animal."
+    },
+    {
+      "$type": "TheAlchemist.Components.HealthComponent, TheAlchemist",
+      "Amount": 10.0,
+      "Max": 10.0,
+      "RegenerationAmount": 0.3,
+      "RegenerationProgress": 0.0
+    },
+    {
+      "$type": "TheAlchemist.Components.ColliderComponent, TheAlchemist",
+      "Solid": false
+    }
+  ]
+}
