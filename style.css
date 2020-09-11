@@ -1,0 +1,57 @@
+body {
+    background-color: rgb(20, 20, 20);
+}
+
+h1 {
+    color: white;
+}
+
+.errorMsg {
+    color: red;
+    font-weight: bold;
+    font-size: large;
+}
+
+#entityList {
+    list-style: none;
+    padding: 5rem;
+}
+
+#entityList ul {
+    list-style: none;
+}
+
+.entityName {
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    font-size: x-large;
+    margin-bottom: 1rem;
+}
+
+li.entity {
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: rgb(60, 60, 60);
+    border: 1px solid black;
+}
+
+li.component {
+    padding: .5rem;
+    border-radius: .5rem;
+    background-color: rgb(80, 80, 80);
+    border: 1px solid black;
+}
+
+div.attribute {
+    display: inline-block;
+    padding: .2rem;
+    margin: .1rem;
+    border-radius: .2rem;   
+    background-color: gray;
+    border: 1px solid black;
+}
+
+input {
+    background-color: transparent;
+}
