@@ -16,10 +16,9 @@ loadedMsg = () => {
  */
 function attributeHtml(attributeName, attributeValue) {
     return `
-        <li>
-            <div class='attribute'>
-                ${attributeName}: <input value='${attributeValue}'>
-            </div>
+        <li class='attribute'>
+            <span class='attributeName'>${attributeName}:</span>
+            <input value='${attributeValue}'>
         </li>
         `
 }
@@ -37,8 +36,8 @@ function componentHtml(component) {
     }
     return `
         <li class='component'>
-            ${componentName}: 
-            <ul>
+            <span class='componentName'>${componentName}</span>
+            <ul class='attributeList'>
                 ${attributesHtml}
             </ul>
         </li>
@@ -60,7 +59,7 @@ function entityHtml(entityName, entity) {
             <div class='entityName'>
                 ${entityName}
             </div>
-            <ul>
+            <ul class='componentList'>
                 ${componentsHtml}
             </ul>
         </li>

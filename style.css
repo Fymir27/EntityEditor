@@ -1,6 +1,10 @@
+/* Background */
+
 body {
     background-color: rgb(20, 20, 20);
 }
+
+/* Text stuff */
 
 h1 {
     color: white;
@@ -12,15 +16,6 @@ h1 {
     font-size: large;
 }
 
-#entityList {
-    list-style: none;
-    padding: 5rem;
-}
-
-#entityList ul {
-    list-style: none;
-}
-
 .entityName {
     color: white;
     font-weight: bold;
@@ -29,22 +24,52 @@ h1 {
     margin-bottom: 1rem;
 }
 
+.componentName {
+    font-weight: bold;
+}
+
+.attributeName {
+    float: left;
+    width: 30%;
+    overflow: hidden;
+}
+
+/* List stuff */
+
+ul {
+    list-style: none;
+}
+
+#entityList {
+    padding: 20%;
+}
+
+.componentList {
+    padding: 10%;
+}
+
+.attributeList {
+    padding: 0;
+}
+
+/* List element stuff */
+
 li.entity {
     padding: 1rem;
     border-radius: 1rem;
-    background-color: rgb(60, 60, 60);
+    background-color: rgb(80, 80, 80);
     border: 1px solid black;
 }
 
 li.component {
     padding: .5rem;
+    margin: .2rem;
     border-radius: .5rem;
-    background-color: rgb(80, 80, 80);
+    background-color: rgb(100, 100, 100);
     border: 1px solid black;
 }
 
-div.attribute {
-    display: inline-block;
+li.attribute {
     padding: .2rem;
     margin: .1rem;
     border-radius: .2rem;   
@@ -52,6 +77,19 @@ div.attribute {
     border: 1px solid black;
 }
 
+/* input stuff */
+
 input {
-    background-color: transparent;
+    background-color: rgb(200, 200, 200);
+    border-style: none none none none;
+    border-color: rgb(60, 60, 60);
+}
+
+input:focus {    
+    outline-offset: 0px;
+    outline: aqua 1px solid;
+}
+
+.attribute input {
+    width: 70%;
 }
