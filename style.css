@@ -41,14 +41,22 @@ ul {
 }
 
 #entityList {
-    padding: 20%;
+    padding: 3rem 20%;
 }
 
 .componentList {
-    padding: 10%;
+    padding: 1rem 10%;
 }
 
 .attributeList {
+    padding: 0;
+}
+
+.nestedEntity {
+    padding: 0;
+}
+
+.inputList {
     padding: 0;
 }
 
@@ -90,6 +98,10 @@ input:focus {
     outline: aqua 1px solid;
 }
 
-.attribute input {
+.attribute input:not(.arrayInput) {
     width: 70%;
+}
+
+button.addArrayEntry {
+    margin-top: .1rem;
 }

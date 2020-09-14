@@ -9,16 +9,56 @@ loadedMsg = () => {
     console.log("Doc loadeed")
 }
 
+function arrayHtml(name, arr) {
+    if (arr.length > 0 && typeof (arr[0]) == "object") {
+
+        if (arr[0].$type === undefined) {
+            return JSON.stringify(arr); // TODO:
+        }
+
+        let componentsHtml = ""
+        for (let component of arr) {
+            componentsHtml += componentHtml(component)
+        }
+        return `
+            <span class'attributeName'>${name}</span>:
+            <ul class='nestedEntity'>
+                ${componentsHtml}
+            </ul>
+            `
+    }
+    let inputsHtml = arr.map(val => `<li><input class='arrayInput' value='${val}'></li>`).join("")
+    return `
+        <ul class='inputList'>
+            <span class'attributeName'>${name}</span>:
+            ${inputsHtml}
+            <button type='button' class='addArrayEntry'>+</button>
+        </ul>
+        `
+}
+
 /**
  * 
  * @param {string} attributeName 
  * @param {string|number|Array|object} attributeValue 
  */
 function attributeHtml(attributeName, attributeValue) {
-    return `
-        <li class='attribute'>
+
+    let inputHtml = ""
+    if (Array.isArray(attributeValue)) {
+        inputHtml = arrayHtml(attributeName, attributeValue)
+    } else if (typeof attributeValue === "object") {
+        inputHtml = JSON.stringify(attributeValue); // TODO:
+    } else {
+        inputHtml = `
             <span class='attributeName'>${attributeName}:</span>
             <input value='${attributeValue}'>
+        `
+    }
+
+    return `
+        <li class='attribute'>            
+            ${inputHtml}
         </li>
         `
 }
