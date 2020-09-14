@@ -13,7 +13,16 @@ function arrayHtml(name, arr) {
     if (arr.length > 0 && typeof (arr[0]) == "object") {
 
         if (arr[0].$type === undefined) {
-            return JSON.stringify(arr); // TODO:
+            let keyValueHtml = ""
+            for (let key of arr) {
+                keyValueHtml += attributeHtml("", key)
+            }
+            return `
+                <ul class='attributeArray'>
+                    <label>${name}</label>:
+                    ${keyValueHtml}
+                </ul>
+            `
         }
 
         let componentsHtml = ""
@@ -48,7 +57,16 @@ function attributeHtml(attributeName, attributeValue) {
     if (Array.isArray(attributeValue)) {
         inputHtml = arrayHtml(attributeName, attributeValue)
     } else if (typeof attributeValue === "object") {
-        inputHtml = JSON.stringify(attributeValue); // TODO:
+        inputHtml = "<ul>"
+        for (let key in attributeValue) {
+            inputHtml += `
+                <li>
+                    <label class='key'>${key}</label>
+                    <input value='${attributeValue[key]}'>
+                </li>
+            `
+        }
+        inputHtml += "</ul>"
     } else {
         inputHtml = `
             <span class='attributeName'>${attributeName}:</span>

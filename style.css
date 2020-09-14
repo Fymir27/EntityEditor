@@ -34,6 +34,11 @@ h1 {
     overflow: hidden;
 }
 
+.key {
+    float: left;
+    width: 30%;
+}
+
 /* List stuff */
 
 ul {
@@ -58,6 +63,10 @@ ul {
 
 .inputList {
     padding: 0;
+}
+
+.attributeArray {
+    padding: 0
 }
 
 /* List element stuff */
