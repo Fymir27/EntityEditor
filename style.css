@@ -21,7 +21,6 @@ h1 {
     font-weight: bold;
     text-align: center;
     font-size: x-large;
-    margin-bottom: 1rem;
 }
 
 .componentName {
@@ -29,9 +28,10 @@ h1 {
 }
 
 .attributeName {
-    float: left;
+    display: inline-flex;
     width: 30%;
     overflow: hidden;
+    font-size: small;
 }
 
 .key {
@@ -53,32 +53,28 @@ ul {
     padding: 1rem 10%;
 }
 
+.componentList.nested {
+    padding: .1rem;
+}
+
 .attributeList {
-    padding: 0;
+    padding: .2rem 0;
 }
 
-.nestedEntity {
-    padding: 0;
-}
+/* elements stuff */
 
-.inputList {
-    padding: 0;
-}
-
-.attributeArray {
-    padding: 0
-}
-
-/* List element stuff */
-
-li.entity {
+.entity {
     padding: 1rem;
     border-radius: 1rem;
     background-color: rgb(80, 80, 80);
     border: 1px solid black;
 }
 
-li.component {
+.entity.nested {
+    padding: .1rem;
+}
+
+.component {
     padding: .5rem;
     margin: .2rem;
     border-radius: .5rem;
@@ -86,7 +82,7 @@ li.component {
     border: 1px solid black;
 }
 
-li.attribute {
+.attribute {
     padding: .2rem;
     margin: .1rem;
     border-radius: .2rem;   
@@ -108,7 +104,7 @@ input:focus {
 }
 
 .attribute input:not(.arrayInput) {
-    width: 70%;
+    width: 65%;
 }
 
 button.addArrayEntry {

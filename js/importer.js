@@ -9,40 +9,30 @@ loadedMsg = () => {
     console.log("Doc loadeed")
 }
 
-function arrayHtml(name, arr) {
-    if (arr.length > 0 && typeof (arr[0]) == "object") {
-
-        if (arr[0].$type === undefined) {
-            let keyValueHtml = ""
-            for (let key of arr) {
-                keyValueHtml += attributeHtml("", key)
+function attributeValueHtml(attributeValue) {
+    if (Array.isArray(attributeValue)) {
+        if (attributeValue.length > 0 && attributeValue[0].$type) {
+            return entityHtml("", attributeValue, true)
+        } else {
+            let nestedAttributeHtml = "";
+            let index = 0;
+            for (let nestedAttr of attributeValue) {
+                nestedAttributeHtml += /* html */`<li>${attributeValueHtml(nestedAttr)}</li>`
             }
-            return `
-                <ul class='attributeArray'>
-                    <label>${name}</label>:
-                    ${keyValueHtml}
-                </ul>
-            `
+            return `<ul class='attributeList'>${nestedAttributeHtml}</ul>`;
         }
-
-        let componentsHtml = ""
-        for (let component of arr) {
-            componentsHtml += componentHtml(component)
-        }
-        return `
-            <span class'attributeName'>${name}</span>:
-            <ul class='nestedEntity'>
-                ${componentsHtml}
-            </ul>
-            `
     }
-    let inputsHtml = arr.map(val => `<li><input class='arrayInput' value='${val}'></li>`).join("")
-    return `
-        <ul class='inputList'>
-            <span class'attributeName'>${name}</span>:
-            ${inputsHtml}
-            <button type='button' class='addArrayEntry'>+</button>
-        </ul>
+
+    if (typeof attributeValue === "object") {
+        let nestedAttributeHtml = "";
+        for (let key in attributeValue) {
+            nestedAttributeHtml += /* html */`<li>${attributeHtml(key, attributeValue[key])}</li>`
+        }
+        return `<ul class='attributeList'>${nestedAttributeHtml}</ul>`;
+    }
+
+    return /* html */`
+            <input value='${attributeValue}'>
         `
 }
 
@@ -52,32 +42,11 @@ function arrayHtml(name, arr) {
  * @param {string|number|Array|object} attributeValue 
  */
 function attributeHtml(attributeName, attributeValue) {
-
-    let inputHtml = ""
-    if (Array.isArray(attributeValue)) {
-        inputHtml = arrayHtml(attributeName, attributeValue)
-    } else if (typeof attributeValue === "object") {
-        inputHtml = "<ul>"
-        for (let key in attributeValue) {
-            inputHtml += `
-                <li>
-                    <label class='key'>${key}</label>
-                    <input value='${attributeValue[key]}'>
-                </li>
-            `
-        }
-        inputHtml += "</ul>"
-    } else {
-        inputHtml = `
-            <span class='attributeName'>${attributeName}:</span>
-            <input value='${attributeValue}'>
-        `
-    }
-
-    return `
-        <li class='attribute'>            
-            ${inputHtml}
-        </li>
+    return /* html */`
+        <div class='attribute'>
+            <div class='attributeName'>${attributeName}:</div>            
+            ${attributeValueHtml(attributeValue)}
+        </div>
         `
 }
 
@@ -90,16 +59,15 @@ function componentHtml(component) {
     let attributesHtml = "";
     for (let attribute in component) {
         if (attribute === "$type") continue;
-        attributesHtml += attributeHtml(attribute, component[attribute])
+        attributesHtml += `<li>${attributeHtml(attribute, component[attribute])}</li>`
     }
-    return `
-        <li class='component'>
+    return /* html */`
+        <div class='component'>
             <span class='componentName'>${componentName}</span>
             <ul class='attributeList'>
                 ${attributesHtml}
             </ul>
-        </li>
-        `
+        </div>`
 }
 
 /**
@@ -107,21 +75,22 @@ function componentHtml(component) {
  * @param {string} entityName 
  * @param {object} entity 
  */
-function entityHtml(entityName, entity) {
+function entityHtml(entityName, entity, nested = false) {
     let componentsHtml = "";
     for (let component of entity) {
-        componentsHtml += componentHtml(component)
+        componentsHtml += `<li>${componentHtml(component)}</li>`;
     }
-    return `
-        <li class='entity'>
-            <div class='entityName'>
-                ${entityName}
-            </div>
-            <ul class='componentList'>
+
+    let nameHtml = nested ? "" : /* html */`<h2 class='entityName'>${entityName}</h2>`
+    let extraClasses = nested ? "nested" : ""
+
+    return /* html */`
+        <div class='entity ${extraClasses}'>
+            ${nameHtml}
+            <ul class='componentList ${extraClasses}'>
                 ${componentsHtml}
             </ul>
-        </li>
-        `
+        </div>`
 }
 
 window.onload = () => {
@@ -142,7 +111,7 @@ window.onload = () => {
             let entitiesHtml = "";
             try {
                 for (let entityName in entities) {
-                    entitiesHtml += entityHtml(entityName, entities[entityName])
+                    entitiesHtml += `<li>${entityHtml(entityName, entities[entityName])}</li>`
                 }
                 list.innerHTML = entitiesHtml;
             } catch (error) {
