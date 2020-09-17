@@ -61,7 +61,16 @@ ul {
     padding: .2rem 0;
 }
 
+.attributeValueList {
+    padding: .1rem 0;
+    margin-bottom: .1rem;
+}
+
 /* elements stuff */
+
+.hide {
+    display: none;
+}
 
 .entity {
     padding: 1rem;
@@ -96,6 +105,12 @@ input {
     background-color: rgb(200, 200, 200);
     border-style: none none none none;
     border-color: rgb(60, 60, 60);
+}
+
+textarea {
+    width: 100%;
+    height: 50%;
+    font-size: small;
 }
 
 input:focus {    

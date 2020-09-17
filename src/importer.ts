@@ -1,14 +1,37 @@
+const fs = require("fs")
+
+let entities = {}
+let filename: string;
+
+// https://stackoverflow.com/questions/423376/how-to-get-the-file-name-from-a-full-path-using-javascript
+function filenameFromPath(path: string) {
+    return path.split('\\').pop().split('/').pop();
+}
+
+function initExportButton() {
+
+    let exportButton = <HTMLButtonElement>document.getElementById("exportButton")
+
+    exportButton.classList.add("hide")
+
+    exportButton.addEventListener("click", event => {
+        let serialized = JSON.stringify(entities, null, 4)
+        fs.writeFileSync(filename, serialized)
+    })
+}
+
+
 /**
  * watches for changes in #inputFile input
  * on change parses and displays entities in file 
  */
-window.onload = () => {
+function initImporter() {
+
     let fileInput = <HTMLInputElement>document.getElementById("inputFile")
     let list = document.getElementById("entityList")
     fileInput.onchange = changeEvent => {
         let reader = new FileReader()
         reader.onload = fileLoadedEvent => {
-            let entities = {}
             try {
                 let result = <string>fileLoadedEvent.target.result
                 entities = JSON.parse(result)
@@ -18,20 +41,34 @@ window.onload = () => {
                 return
             }
 
-            let entitiesHtml = ""
             try {
                 for (let entityName in entities) {
-                    entitiesHtml += /* html */`<li>${entityHtml(entityName, entities[entityName])}</li>`
+                    list.append(wrap("li", entityHtml(entityName, entities[entityName], 0)));
                 }
-                list.innerHTML = entitiesHtml
+                filename = filenameFromPath(fileInput.value)
+                let exportButton = <HTMLButtonElement>document.getElementById("exportButton")
+                exportButton.setAttribute("href", filename)
+                exportButton.classList.remove("hide")
             } catch (error) {
                 console.log(error)
-                list.innerHTML = /* html */`<li class='errorMsg'>Invalid format!</li>`
+                list.innerHTML += /* html */`<li class='errorMsg'>Invalid format!</li>`
             }
 
         }
         reader.readAsText(fileInput.files[0])
     }
+}
+
+function wrap(tagName: string, inner: HTMLElement | string, classes: Array<string> = []) {
+
+    let el = document.createElement(tagName)
+
+    if (typeof inner === "string") el.innerHTML = inner
+    else el.append(inner)
+
+    if (classes.length > 0) el.classList.add(...classes)
+
+    return el
 }
 
 interface Component {
@@ -46,81 +83,93 @@ function isComponent(obj: object): obj is Component {
  * @param {string} entityName 
  * @param {Array<Component>} entity 
  */
-function entityHtml(entityName: string, entity: Array<Component>, nested = false) {
-    let componentsHtml = ""
+function entityHtml(entityName: string, entity: Array<Component>, nestingLevel: number) {
+
+    let componentList = document.createElement("ul")
+    componentList.classList.add("componentList")
+
     for (let component of entity) {
-        componentsHtml += `<li>${componentHtml(component)}</li>`
+        componentList.append(wrap("li", componentHtml(component, nestingLevel)));
     }
 
-    let nameHtml = nested ? "" : /* html */`<h2 class='entityName'>${entityName}</h2>`
-    let extraClasses = nested ? "nested" : ""
+    let entityElem = document.createElement("div")
+    entityElem.classList.add("entity")
 
-    return /* html */`
-        <div class='entity ${extraClasses}'>
-            ${nameHtml}
-            <ul class='componentList ${extraClasses}'>
-                ${componentsHtml}
-            </ul>
-        </div>`
+    if (nestingLevel > 0) {
+        entityElem.classList.add("nested")
+        componentList.classList.add("nested")
+    } else {
+        entityElem.append(wrap("h2", entityName, ["entityName"]))
+    }
+
+    entityElem.append(componentList);
+
+    return entityElem;
 }
 
 /**
  * @param {Component} component 
  */
-function componentHtml(component: Component) {
+function componentHtml(component: Component, nestingLevel: number) {
     let componentName = component.$type.split(".").pop().split(",")[0]
-    let attributesHtml = ""
+
+    let attributeList = document.createElement("ul")
+    attributeList.classList.add("attributeList")
+
     for (let attribute in component) {
         if (attribute === "$type") continue
-        attributesHtml += `<li>${attributeHtml(attribute, component[attribute])}</li>`
+        attributeList.append(wrap("li", attributeHtml(attribute, component[attribute], nestingLevel, component)))
     }
-    return /* html */`
-        <div class='component'>
-            <span class='componentName'>${componentName}</span>
-            <ul class='attributeList'>
-                ${attributesHtml}
-            </ul>
-        </div>`
+
+    let componentElement = wrap("div", wrap("span", componentName, ["componentName"]), ["component"])
+
+    componentElement.append(attributeList)
+
+    return componentElement
 }
 
 /**
  * @param {string} attributeName 
  * @param {string|number|Array|object} attributeValue 
  */
-function attributeHtml(attributeName: string, attributeValue: string | number | Array<any> | object) {
-    return /* html */`
-        <div class='attribute'>
-            <div class='attributeName'>${attributeName}:</div>            
-            ${attributeValueHtml(attributeValue)}
-        </div>`
+function attributeHtml(attributeName: string, attributeValue: string | number | Array<any> | object, nestingLevel: number, component: Component) {
+
+    let attributeElement = wrap("div", wrap("div", attributeName, ["attributeName"]), ["attribute"])
+    attributeElement.append(attributeValueHtml(attributeValue, nestingLevel, component, attributeName))
+    return attributeElement;
 }
 
 /**
  * @param {string|number|Array|object} attributeValue 
  */
-function attributeValueHtml(attributeValue: string | number | Array<any> | object) {
+function attributeValueHtml(attributeValue: string | number | Array<any> | object, nestingLevel: number, component: Component, attributeName: string | number) {
 
     if (Array.isArray(attributeValue)) {
         if (attributeValue.length > 0 && isComponent(attributeValue[0])) {
-            return entityHtml("", attributeValue, true)
+            return entityHtml("", attributeValue, nestingLevel + 1)
         } else {
-            let nestedAttributeHtml = ""
             let index = 0
+            let valueList = document.createElement("ul")
+            valueList.classList.add("attributeValueList")
             for (let nestedAttr of attributeValue) {
-                nestedAttributeHtml += /* html */`<li>${attributeValueHtml(nestedAttr)}</li>`
+                valueList.append(wrap("li", attributeValueHtml(nestedAttr, nestingLevel, component[attributeName], index++)))
             }
-            return /* html */`<ul class='attributeList'>${nestedAttributeHtml}</ul>`
+            return valueList
         }
     }
 
     if (typeof attributeValue === "object") {
-        let nestedAttributeHtml = ""
+        let attributeList = document.createElement("ul")
+        attributeList.classList.add("attributeList")
         for (let key in attributeValue) {
-            nestedAttributeHtml += /* html */`<li>${attributeHtml(key, attributeValue[key])}</li>`
+            attributeList.append(wrap("li", attributeHtml(key, attributeValue[key], nestingLevel, component[attributeName])))
         }
-        return /* html */`<ul class='attributeList'>${nestedAttributeHtml}</ul>`
+        return attributeList
     }
 
     // type is string/number
-    return /* html */`<input value='${attributeValue}'>`
+    let input = document.createElement("input")
+    input.setAttribute("value", attributeValue.toString())
+    input.addEventListener("change", event => component[attributeName] = (<HTMLInputElement>event.target).value)
+    return input
 }
