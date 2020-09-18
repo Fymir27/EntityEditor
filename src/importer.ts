@@ -1,11 +1,11 @@
 const fs = require("fs")
 
 let entities = {}
-let filename: string;
+let filename: string
 
 // https://stackoverflow.com/questions/423376/how-to-get-the-file-name-from-a-full-path-using-javascript
 function filenameFromPath(path: string) {
-    return path.split('\\').pop().split('/').pop();
+    return path.split('\\').pop().split('/').pop()
 }
 
 function initExportButton() {
@@ -16,6 +16,7 @@ function initExportButton() {
 
     exportButton.addEventListener("click", event => {
         let serialized = JSON.stringify(entities, null, 4)
+        console.log(serialized)
         fs.writeFileSync(filename, serialized)
     })
 }
@@ -43,7 +44,7 @@ function initImporter() {
 
             try {
                 for (let entityName in entities) {
-                    list.append(wrap("li", entityHtml(entityName, entities[entityName], 0)));
+                    list.append(wrap("li", entityHtml(entityName, entities[entityName])))
                 }
                 filename = filenameFromPath(fileInput.value)
                 let exportButton = <HTMLButtonElement>document.getElementById("exportButton")
@@ -79,38 +80,31 @@ function isComponent(obj: object): obj is Component {
     return (<Component>obj).$type !== undefined
 }
 
-/**
- * @param {string} entityName 
- * @param {Array<Component>} entity 
- */
-function entityHtml(entityName: string, entity: Array<Component>, nestingLevel: number) {
+function entityHtml(entityName: string, entity: Array<Component>, nested = false) {
 
     let componentList = document.createElement("ul")
     componentList.classList.add("componentList")
 
     for (let component of entity) {
-        componentList.append(wrap("li", componentHtml(component, nestingLevel)));
+        componentList.append(wrap("li", componentHtml(component)))
     }
 
     let entityElem = document.createElement("div")
     entityElem.classList.add("entity")
 
-    if (nestingLevel > 0) {
+    if (nested) {
         entityElem.classList.add("nested")
         componentList.classList.add("nested")
     } else {
         entityElem.append(wrap("h2", entityName, ["entityName"]))
     }
 
-    entityElem.append(componentList);
+    entityElem.append(componentList)
 
-    return entityElem;
+    return entityElem
 }
 
-/**
- * @param {Component} component 
- */
-function componentHtml(component: Component, nestingLevel: number) {
+function componentHtml(component: Component) {
     let componentName = component.$type.split(".").pop().split(",")[0]
 
     let attributeList = document.createElement("ul")
@@ -118,7 +112,7 @@ function componentHtml(component: Component, nestingLevel: number) {
 
     for (let attribute in component) {
         if (attribute === "$type") continue
-        attributeList.append(wrap("li", attributeHtml(attribute, component[attribute], nestingLevel, component)))
+        attributeList.append(wrap("li", attributeHtml(component, attribute)))
     }
 
     let componentElement = wrap("div", wrap("span", componentName, ["componentName"]), ["component"])
@@ -128,31 +122,26 @@ function componentHtml(component: Component, nestingLevel: number) {
     return componentElement
 }
 
-/**
- * @param {string} attributeName 
- * @param {string|number|Array|object} attributeValue 
- */
-function attributeHtml(attributeName: string, attributeValue: string | number | Array<any> | object, nestingLevel: number, component: Component) {
+function attributeHtml(component: Component | object, attributeName: string) {
 
     let attributeElement = wrap("div", wrap("div", attributeName, ["attributeName"]), ["attribute"])
-    attributeElement.append(attributeValueHtml(attributeValue, nestingLevel, component, attributeName))
-    return attributeElement;
+    attributeElement.append(attributeValueHtml(component, attributeName))
+    return attributeElement
 }
 
-/**
- * @param {string|number|Array|object} attributeValue 
- */
-function attributeValueHtml(attributeValue: string | number | Array<any> | object, nestingLevel: number, component: Component, attributeName: string | number) {
+function attributeValueHtml(parent: object | ArrayLike<any>, attributeName: string | number) {
+
+    let attributeValue: string | number | boolean | Array<any> | object = parent[attributeName]
 
     if (Array.isArray(attributeValue)) {
         if (attributeValue.length > 0 && isComponent(attributeValue[0])) {
-            return entityHtml("", attributeValue, nestingLevel + 1)
+            return entityHtml("", attributeValue, true)
         } else {
             let index = 0
             let valueList = document.createElement("ul")
             valueList.classList.add("attributeValueList")
             for (let nestedAttr of attributeValue) {
-                valueList.append(wrap("li", attributeValueHtml(nestedAttr, nestingLevel, component[attributeName], index++)))
+                valueList.append(wrap("li", attributeValueHtml(attributeValue, index++)))
             }
             return valueList
         }
@@ -162,14 +151,26 @@ function attributeValueHtml(attributeValue: string | number | Array<any> | objec
         let attributeList = document.createElement("ul")
         attributeList.classList.add("attributeList")
         for (let key in attributeValue) {
-            attributeList.append(wrap("li", attributeHtml(key, attributeValue[key], nestingLevel, component[attributeName])))
+            attributeList.append(wrap("li", attributeHtml(attributeValue, key)))
         }
         return attributeList
     }
 
-    // type is string/number
+    // type is string/number/bool
     let input = document.createElement("input")
     input.setAttribute("value", attributeValue.toString())
-    input.addEventListener("change", event => component[attributeName] = (<HTMLInputElement>event.target).value)
+    input.addEventListener("change", event => {
+        let value = (<HTMLInputElement>event.target).value
+        let num = Number(value);
+        if (!Number.isNaN(num)) {
+            parent[attributeName] = num
+        } else if (value.toLowerCase() === "true") {
+            parent[attributeName] = true
+        } else if (value.toLowerCase() === "false") {
+            parent[attributeName] = false
+        } else {
+            parent[attributeName] = value
+        }
+    })
     return input
 }
