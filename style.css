@@ -46,7 +46,7 @@ ul {
 }
 
 #entityList {
-    padding: 3rem 20%;
+    padding: 3rem 10%;
 }
 
 .componentList {
@@ -62,8 +62,8 @@ ul {
 }
 
 .attributeValueList {
-    padding: .1rem 0;
-    margin-bottom: .1rem;
+    padding: .3rem;
+    margin-bottom: .3rem;
 }
 
 /* elements stuff */
@@ -99,6 +99,21 @@ ul {
     border: 1px solid black;
 }
 
+.outerArrayElem {
+    border: 1px dashed black;
+    border-radius: .2rem;
+    margin: .2rem;
+    overflow: auto;
+}
+
+.right {
+    float: right;
+}
+
+div {
+    overflow: auto;
+}
+
 /* input stuff */
 
 input {
@@ -122,6 +137,18 @@ input:focus {
     width: 65%;
 }
 
+button {
+    border: none;
+    border-radius: .2rem;
+    font-weight: bold;
+}
+
 button.addArrayEntry {
     margin-top: .1rem;
+    color: green;
+}
+
+button.removeArrayEntry {
+    margin: .1rem;
+    color: red;
 }

@@ -16,7 +16,6 @@ function initExportButton() {
 
     exportButton.addEventListener("click", event => {
         let serialized = JSON.stringify(entities, null, 4)
-        console.log(serialized)
         fs.writeFileSync(filename, serialized)
     })
 }
@@ -134,15 +133,45 @@ function attributeValueHtml(parent: object | ArrayLike<any>, attributeName: stri
     let attributeValue: string | number | boolean | Array<any> | object = parent[attributeName]
 
     if (Array.isArray(attributeValue)) {
-        if (attributeValue.length > 0 && isComponent(attributeValue[0])) {
-            return entityHtml("", attributeValue, true)
+
+        let arr = attributeValue as any[]
+
+        if (arr.length > 0 && isComponent(arr[0])) {
+            return entityHtml("", arr, true)
         } else {
-            let index = 0
             let valueList = document.createElement("ul")
             valueList.classList.add("attributeValueList")
-            for (let nestedAttr of attributeValue) {
-                valueList.append(wrap("li", attributeValueHtml(attributeValue, index++)))
+            for (let index = 0; index < arr.length; index++) {
+                let attrValElem = attributeValueHtml(arr, index)
+                let listElement = wrap("li", attrValElem)
+
+                let removeButton = wrap("button", "x", ["removeArrayEntry"])
+                removeButton.addEventListener("click", event => {
+                    arr = arr.splice(index, 1)
+                    listElement.remove()
+                })
+
+                if (attrValElem instanceof HTMLInputElement) {
+                    listElement.append(removeButton)
+                } else {
+                    removeButton.classList.add("right")
+                    removeButton = wrap("div", removeButton);
+                    listElement.prepend(removeButton)
+                    listElement.classList.add("outerArrayElem")
+                }
+
+                valueList.append(listElement)
             }
+
+            if (arr.length > 0) {
+                let addValueButton = wrap("button", "+", ["addArrayEntry"])
+                addValueButton.addEventListener("click", event => {
+                    let newLength = arr.push(JSON.parse(JSON.stringify(arr[arr.length - 1]))) // deep copy last existing element
+                    valueList.insertBefore(wrap("li", attributeValueHtml(arr, newLength - 1)), addValueButton)
+                })
+                valueList.append(addValueButton)
+            }
+
             return valueList
         }
     }
