@@ -114,7 +114,7 @@ function componentHtml(component: Component) {
         attributeList.append(wrap("li", attributeHtml(component, attribute)))
     }
 
-    let componentElement = wrap("div", wrap("span", componentName, ["componentName"]), ["component"])
+    let componentElement = wrap("div", wrap("div", componentName, ["componentName"]), ["component"])
 
     componentElement.append(attributeList)
 
